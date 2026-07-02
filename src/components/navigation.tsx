@@ -15,7 +15,7 @@ const Navigation = ({ navArray }: { navArray: navArrayItem[] }) => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0">
-            <Link className="text-white text-2xl font-bold" href="/">Chih-Ho.info</Link>
+            <Link className="text-white text-2xl font-bold" href="/">ChihHo-Dev</Link>
           </div>
           <div>
             <ul className="flex sm:space-x-1 md:space-x-4">
