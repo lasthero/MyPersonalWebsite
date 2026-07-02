@@ -29,12 +29,12 @@ const Navigation = ({ navArray }: { navArray: navArrayItem[] }) => {
     </nav>
   );
 };
-const NavItem = ({ href, pathname, key, children }: any) => {
+const NavItem = ({ href, pathname, children }: any) => {
   const isActive = pathname === href;
   const activeClassName = isActive ? 'font-bold' : '';
 
   return (
-    <li key={key}>
+    <li>
       <Link className={`text-white hover:text-gray-300 ${activeClassName}`} href={href}>{children}</Link>
     </li>
   );

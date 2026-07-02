@@ -1,4 +1,6 @@
 import Link from "next/link";
+export const dynamic = 'force-dynamic';
+
 async function getData() {
     const username = 'chihho.chou';
     const mediumRssUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURI(`https://medium.com/feed/@${username}`)}`;
