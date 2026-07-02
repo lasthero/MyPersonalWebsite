@@ -8,14 +8,23 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      colors: {
+        green: {
+          terminal: '#22c55e',
+          dim: '#16a34a',
+          muted: '#14532d',
+        },
+        dark: {
+          bg: '#0d0d0d',
+          bg2: '#111111',
+          bg3: '#1a1a1a',
+          border: '#222222',
+          border2: '#2a2a2a',
+        }
       },
       fontFamily: {
-        'sans': ['Roboto', 'sans-serif'],
-      }
+        mono: ['JetBrains Mono', 'Fira Code', 'Cascadia Code', 'monospace'],
+      },
     },
   },
   plugins: [],
