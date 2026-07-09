@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
     "@aws-sdk/client-s3": "^3.1077.0",
     "@aws-sdk/s3-request-presigner": "^3.1077.0",
     "@portabletext/react": "^3.0.18",
-    "@sanity/image-url": "^1.0.2",
+    "@sanity/code-input": "^7.2.5",
+    "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^6.3.0",
     "classnames": "^2.5.1",
     "dotenv": "^16.4.5",
