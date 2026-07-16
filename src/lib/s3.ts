@@ -3,12 +3,8 @@ import "server-only";
 import { S3Client, GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { unstable_cache } from 'next/cache';
-import Anthropic from '@anthropic-ai/sdk';
 
 const s3 = new S3Client({ region: process.env.AWS_REGION ?? "us-east-1" });
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
 
 export const getResumeDataFromPdf = unstable_cache(async () => {
   // fetch PDF buffer from S3
