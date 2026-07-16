@@ -6,7 +6,6 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SanityDocument } from "next-sanity";
 import { sanityFetch } from "@/sanity/client";
-import { headers } from "next/headers";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 const NAV_MENU_QUERY = `*[_type == "navigationList"] {navArray[]->}`;
@@ -29,13 +28,14 @@ export default async function RootLayout({
     <html lang="en">
       <body className={jetbrainsMono.className} style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <div style={{ display: 'flex', flex: 1 }}>
-          {/* Side navigation */}
+          {/* Side navigation — hidden on mobile, shown on desktop */}
           <Navigation navArray={navArray} />
 
           {/* Main content area */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            {/* Top bar */}
+            {/* Top bar — hidden on mobile (navigation renders its own mobile bar) */}
             <div
+              className="desktop-topbar"
               style={{
                 padding: '10px 24px',
                 borderBottom: '1px solid var(--border)',
@@ -53,7 +53,7 @@ export default async function RootLayout({
             </div>
 
             {/* Page content */}
-            <main style={{ flex: 1, padding: '32px', overflowY: 'auto', background: 'var(--bg)' }}>
+            <main className="main-content" style={{ flex: 1, padding: '32px', overflowY: 'auto', background: 'var(--bg)' }}>
               {children}
             </main>
 
