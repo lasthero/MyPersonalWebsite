@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 type NavArrayItem = {
   title: string;
@@ -9,24 +10,26 @@ type NavArrayItem = {
 
 const Navigation = ({ navArray }: { navArray: NavArrayItem[] }) => {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  return (
-    <nav
-      style={{
-        width: '200px',
-        minHeight: '100vh',
-        background: 'var(--bg-2)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0,
-        position: 'sticky',
-        top: 0,
-      }}
-    >
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // close drawer on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  const navLinks = (
+    <>
       {/* Logo */}
       <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid var(--border)' }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
+        <Link href="/" style={{ textDecoration: 'none' }} onClick={() => setMobileOpen(false)}>
           <div style={{ color: 'var(--green)', fontWeight: 700, fontSize: '15px', fontFamily: 'monospace' }}>
             &lt;/&gt; CH
           </div>
@@ -48,7 +51,7 @@ const Navigation = ({ navArray }: { navArray: NavArrayItem[] }) => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '9px 16px',
+                padding: '10px 16px',
                 fontSize: '13px',
                 color: isActive ? 'var(--green)' : 'var(--text-secondary)',
                 textDecoration: 'none',
@@ -71,7 +74,103 @@ const Navigation = ({ navArray }: { navArray: NavArrayItem[] }) => {
           <div>sanity cms</div>
         </div>
       </div>
-    </nav>
+    </>
+  );
+
+  // Desktop sidebar
+  if (!isMobile) {
+    return (
+      <nav style={{
+        width: '200px',
+        minHeight: '100vh',
+        background: 'var(--bg-2)',
+        borderRight: '1px solid var(--border)',
+        display: 'flex',
+        flexDirection: 'column',
+        flexShrink: 0,
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        overflowY: 'auto',
+      }}>
+        {navLinks}
+      </nav>
+    );
+  }
+
+  // Mobile — top bar + drawer
+  return (
+    <>
+      {/* Mobile top bar */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        background: 'var(--bg-2)',
+        borderBottom: '1px solid var(--border)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '12px 16px',
+        height: '52px',
+      }}>
+        <Link href="/" style={{ textDecoration: 'none' }}>
+          <span style={{ color: 'var(--green)', fontWeight: 700, fontSize: '14px', fontFamily: 'monospace' }}>
+            &lt;/&gt; AC
+          </span>
+        </Link>
+        <button
+          onClick={() => setMobileOpen(o => !o)}
+          aria-label="Toggle menu"
+          style={{
+            background: 'none',
+            border: '1px solid var(--border)',
+            borderRadius: '3px',
+            padding: '4px 8px',
+            cursor: 'pointer',
+            color: 'var(--green)',
+            fontFamily: 'monospace',
+            fontSize: '12px',
+          }}
+        >
+          {mobileOpen ? '✕ close' : '☰ menu'}
+        </button>
+      </div>
+
+      {/* Backdrop */}
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 110,
+            background: 'rgba(0,0,0,0.6)',
+          }}
+        />
+      )}
+
+      {/* Drawer */}
+      <nav style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        zIndex: 120,
+        width: '220px',
+        background: 'var(--bg-2)',
+        borderRight: '1px solid var(--border)',
+        display: 'flex',
+        flexDirection: 'column',
+        transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.25s ease',
+        overflowY: 'auto',
+      }}>
+        {navLinks}
+      </nav>
+    </>
   );
 };
 

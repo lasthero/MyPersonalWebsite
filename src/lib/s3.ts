@@ -3,12 +3,8 @@ import "server-only";
 import { S3Client, GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { unstable_cache } from 'next/cache';
-import Anthropic from '@anthropic-ai/sdk';
 
 const s3 = new S3Client({ region: process.env.AWS_REGION ?? "us-east-1" });
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
 
 export const getResumeDataFromPdf = unstable_cache(async () => {
   // fetch PDF buffer from S3
@@ -47,95 +43,53 @@ export const getResumeDataFromPdf = unstable_cache(async () => {
     parser.parseBuffer(Buffer.from(buffer));
   });
 
-  const message = await anthropic.messages.create({
-  model: "claude-sonnet-4-6",
-  max_tokens: 2000,
-  system: [
-  {
-    type: "text",
-    text: `You are an expert resume parser with deep knowledge of software engineering roles, technical skills, and career progression patterns across the technology industry.
+  const apiUrl = process.env.AI_API_URL;
+  const apiKey = process.env.AI_API_KEY;
 
-Your sole task is to analyze raw resume text extracted from a PDF and transform it into a precise, well-structured JSON object. The resume text may contain formatting artifacts, inconsistent spacing, or garbled characters from the PDF extraction process — you should intelligently interpret and normalize the content.
+  if (!apiUrl || !apiKey) throw new Error('AI_API_URL or AI_API_KEY not configured');
 
-STRICT OUTPUT RULES:
-- Return ONLY a valid JSON object. No explanation, no preamble, no markdown code fences, no trailing comments.
-- If a field cannot be found in the resume, use null for string fields and [] for array fields.
-- Do not include phone numbers anywhere in the output under any circumstances.
-- Do not invent or hallucinate information not present in the resume text.
+  const ai_response = await fetch(`${apiUrl}/career`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+    },
+    body: JSON.stringify({
+      messages: [{
+        role: 'user',
+        content: `Parse this resume text into JSON. Return ONLY valid JSON, no explanation or markdown.
 
-CONTACT RULES:
-- email: extract the email address as-is
-- linkedin: extract the full LinkedIn URL including https://
-- website: extract personal site URL if present; do not use LinkedIn URL here; use null if absent
-
-SKILLS RULES:
-- Group skills into logical categories such as: languages, backend, frontend, cloud, ci/cd, observability, ml/ai, databases, tools
-- Do not duplicate the same skill across multiple categories
-- Normalize casing consistently (e.g. "typescript" → "TypeScript", "aws" → "AWS")
-- Split combined entries into individual items (e.g. "TypeScript/JavaScript" → ["TypeScript", "JavaScript"])
-- Omit generic terms that are not meaningful skills (e.g. "etc", "and more")
-
-EXPERIENCE RULES:
-- title: the job title exactly as stated, including any department or team qualifier
-- company: the legal or common company name only, without department suffixes
-- period: normalize to "MM/YYYY – MM/YYYY" format, or "MM/YYYY – present" for current roles
-- bullets: concise achievement-oriented statements; preserve all quantitative metrics such as percentages, counts, timeframes, and scale indicators; each bullet should be a complete sentence
-
-CERTIFICATIONS RULES:
-- name: full certification name as stated
-- year: extract the 4-digit year only, even if a full date is provided
-
-ADDITIONAL RULES:
-- additional: list only company names for older or briefly-mentioned roles not covered in the main experience section
-
-OUTPUT SCHEMA:
+Schema:
 {
   "name": string,
   "alias": string or null,
   "title": string,
-  "contact": {
-    "email": string,
-    "linkedin": string,
-    "website": string or null
-  },
-  "skills": {
-    [category: string]: string[]
-  },
-  "experience": [
-    {
-      "title": string,
-      "company": string,
-      "period": string,
-      "bullets": string[]
-    }
-  ],
+  "contact": { "email": string, "linkedin": string, "website": string or null },
+  "skills": { [category: string]: string[] },
+  "experience": [{ "title": string, "company": string, "period": string, "bullets": string[] }],
   "additional": string[],
-  "certifications": [
-    {
-      "name": string,
-      "year": string
-    }
-  ]
-}`,
-  cache_control: { type: "ephemeral", ttl: "1h" },
-  }],
-  messages: [{
-    role: "user",
-    content: `Parse this resume:\n\n${text}` // ← only the variable content here
-  }],
-});
+  "certifications": [{ "name": string, "year": string }]
+}
 
-  console.log('Full usage:', JSON.stringify(message.usage, null, 2));
-  const raw = message.content[0].type === 'text' ? message.content[0].text.trim() : '';
+Do not include phone number.
 
-  if (!raw) throw new Error('Empty response from Claude');
+Resume text:
+${text}`,
+      }],
+    }),
+  });
 
+  if (!ai_response.ok) {
+    const err = await ai_response.json().catch(() => ({}));
+    throw new Error(`AI API error: ${err.error ?? ai_response.status}`);
+  }
+
+  const data = await ai_response.json();
+  const raw = data.content?.trim() ?? '';
   const clean = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '');
   return JSON.parse(clean);
-},
-  ['resume-data'],
-  { revalidate: 604800 }
-);
+
+}, ['resume-data'], { revalidate: 604800, tags: ['resume'] });
 
 export async function getResumeUrl() {
   // List all files in the resumes/ prefix
