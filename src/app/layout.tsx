@@ -22,7 +22,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const navMenu = await sanityFetch<SanityDocument[]>({ query: NAV_MENU_QUERY });
+  console.log('navMenu:', JSON.stringify(navMenu, null, 2));
   const navArray = navMenu?.[0]?.navArray ?? [];
+  console.log('navArray:', navArray);
+
 
   return (
     <html lang="en">
