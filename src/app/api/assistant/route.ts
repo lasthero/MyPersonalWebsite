@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const AI_API_ENDPOINTS: Record<string, string> = {
   jobs:   'analyze',
-  career: 'career',
+  career: 'me/career',
   code:   'code',
 };
 
