@@ -11,7 +11,7 @@ const faqs = [
     a: 'On the home screen, tap "Upload Resume PDF" and select a PDF file from your device. Only PDF files are supported.',
   },
   {
-    q: 'Why can I only do 3 analyses per day?',
+    q: 'Why can I only do 5 analyses per day?',
     a: 'This limit is shared across resume parsing, job matching, and interview prep — it helps us keep the AI free for everyone. It resets at midnight and does not require an account.',
   },
   {

@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
 
         <h2 style={sectionStyle}>Information We Collect</h2>
         <p><strong>Resume content.</strong> When you upload a resume, the App extracts its text on our server only long enough to analyze it with an AI model and return results to your device. The extracted text and any analysis results are stored locally on your device (using secure on-device storage) and are not retained on our servers after the request completes.</p>
-        <p><strong>Device identifier.</strong> The App generates a random identifier stored on your device to enforce a daily usage limit (currently 3 analyses per day). This identifier is not linked to your name, email, or any other personal information we collect, since we don&apos;t collect any.</p>
+        <p><strong>Device identifier.</strong> The App generates a random identifier stored on your device to enforce a daily usage limit (currently 5 analyses per day). This identifier is not linked to your name, email, or any other personal information we collect, since we don&apos;t collect any.</p>
         <p><strong>Search queries.</strong> When you search for jobs, the job title or keywords you enter are logged in aggregate to help us understand which job categories are commonly searched, so we can improve the freshness of cached job listings. This is stored as anonymous search-term statistics, not tied to your device identifier or any personal profile.</p>
         <p><strong>We do not collect:</strong> your name, email address, phone number, precise location, contacts, or any account credentials, because the App does not have an account system.</p>
 
